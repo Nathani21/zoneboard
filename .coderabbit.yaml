@@ -28,6 +28,14 @@ reviews:
       instructions: >-
         Pure logic. Must not touch the DOM, timers or Math.random directly;
         randomness is passed in so tests stay repeatable. Tests in src/scramble.test.ts.
+            - path: "src/cities.ts"
+      instructions: >-
+        City data only. Check each city's IANA time zone is the right one for that
+        city, and that names are at most 13 characters (the board width).
+    - path: "src/search.ts"
+      instructions: >-
+        Pure logic. Must not touch the DOM. Matching must ignore case and accents.
+        Tests in src/search.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
