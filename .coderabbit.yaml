@@ -24,6 +24,10 @@ reviews:
       instructions: >-
         Pure logic. Must not touch the DOM or browser storage. Every exported
         function needs a doc comment and tests in src/board.test.ts.
+    - path: "src/scramble.ts"
+      instructions: >-
+        Pure logic. Must not touch the DOM, timers or Math.random directly;
+        randomness is passed in so tests stay repeatable. Tests in src/scramble.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,

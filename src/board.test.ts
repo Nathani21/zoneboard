@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boardRow, DEFAULT_CITIES, msUntilNextMinute, NAME_CELLS, toCells } from './board'
+import { boardRow, DEFAULT_CITIES, msUntilNextMinute, NAME_CELLS, rowCells, toCells } from './board'
 import { isValidTimeZone } from './zones'
 
 const at = (iso: string) => new Date(iso)
@@ -33,6 +33,15 @@ describe('boardRow', () => {
     expect(row.offset).toBe('GMT+1')
     expect(row.nameCells).toHaveLength(NAME_CELLS)
     expect(row.nameCells.join('').trimEnd()).toBe('LONDON')
+  })
+})
+
+describe('rowCells', () => {
+  it('puts the five time tiles before the name tiles', () => {
+    const row = boardRow(at('2026-10-04T13:28:00Z'), { name: 'Tokyo', timeZone: 'Asia/Tokyo' })
+    const cells = rowCells(row)
+    expect(cells).toHaveLength(5 + NAME_CELLS)
+    expect(cells.join('').trimEnd()).toBe('22:28TOKYO')
   })
 })
 
