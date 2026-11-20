@@ -1,0 +1,55 @@
+import { formatOffset, formatTime, utcOffsetMinutes } from './zones'
+
+/** A city shown on the board: its display name and IANA time zone. */
+export interface City {
+  name: string
+  timeZone: string
+}
+
+/** One board row, ready to draw. */
+export interface BoardRow {
+  name: string
+  time: string
+  nameCells: string[]
+  offset: string
+}
+
+/** Cities shown until the visitor picks their own. */
+export const DEFAULT_CITIES: readonly City[] = [
+  { name: 'Los Angeles', timeZone: 'America/Los_Angeles' },
+  { name: 'New York', timeZone: 'America/New_York' },
+  { name: 'London', timeZone: 'Europe/London' },
+  { name: 'Lagos', timeZone: 'Africa/Lagos' },
+  { name: 'Dubai', timeZone: 'Asia/Dubai' },
+  { name: 'Tokyo', timeZone: 'Asia/Tokyo' },
+]
+
+/** Number of character tiles in the city-name column. */
+export const NAME_CELLS = 13
+
+/**
+ * Splits text into exactly `width` upper-case cells: shorter text is padded
+ * with spaces, longer text is cut off.
+ */
+export function toCells(text: string, width: number): string[] {
+  const cells = Array.from(text.toUpperCase()).slice(0, width)
+  while (cells.length < width) {
+    cells.push(' ')
+  }
+  return cells
+}
+
+/** Everything the board needs to draw one city at a given moment. */
+export function boardRow(date: Date, city: City): BoardRow {
+  return {
+    name: city.name,
+    time: formatTime(date, city.timeZone),
+    nameCells: toCells(city.name, NAME_CELLS),
+    offset: formatOffset(utcOffsetMinutes(date, city.timeZone)),
+  }
+}
+
+/** Milliseconds from `date` until the next whole minute (never 0). */
+export function msUntilNextMinute(date: Date): number {
+  return 60_000 - (date.getTime() % 60_000)
+}
