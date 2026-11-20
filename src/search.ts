@@ -1,0 +1,53 @@
+import type { Place } from './cities'
+
+/**
+ * Lower-cases, trims, collapses spaces and strips accents, so "  SÃO  paulo"
+ * and "sao paulo" compare equal.
+ */
+export function normalize(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Words of a name, split on spaces, hyphens, dots and apostrophes. */
+function words(text: string): string[] {
+  return text.split(/[\s\-.']+/).filter(Boolean)
+}
+
+/**
+ * How well a place matches an already-normalized query; lower is better,
+ * null means no match. 0 exact name, 1 name starts with the query,
+ * 2 a later word of the name does ("york" -> New York), 3 the country does.
+ */
+function matchRank(place: Place, query: string): number | null {
+  const name = normalize(place.name)
+  if (name === query) return 0
+  if (name.startsWith(query)) return 1
+  if (words(name).some((word) => word.startsWith(query))) return 2
+  const country = normalize(place.country)
+  if (country.startsWith(query) || words(country).some((word) => word.startsWith(query))) {
+    return 3
+  }
+  return null
+}
+
+/**
+ * Places matching `query`, best matches first and alphabetical within the
+ * same rank, at most `limit` of them. A blank query returns nothing.
+ */
+export function searchCities(query: string, places: readonly Place[], limit = 6): Place[] {
+  const q = normalize(query)
+  if (q === '') {
+    return []
+  }
+  return places
+    .map((place) => ({ place, rank: matchRank(place, q) }))
+    .filter((match): match is { place: Place; rank: number } => match.rank !== null)
+    .sort((a, b) => a.rank - b.rank || a.place.name.localeCompare(b.place.name, 'en'))
+    .slice(0, limit)
+    .map((match) => match.place)
+}
