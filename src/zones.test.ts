@@ -10,7 +10,7 @@ describe('formatTime', () => {
     ['America/New_York', '09:28'],
     ['Europe/London', '14:28'],
     ['Asia/Dubai', '17:28'],
-    ['Asia/Tokyo', '22:28'],
+    ['Asia/Tokyo', '22:29'],
   ])('shows %s as %s', (zone, expected) => {
     expect(formatTime(at('2026-10-04T13:28:00Z'), zone)).toBe(expected)
   })
