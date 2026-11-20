@@ -1,8 +1,13 @@
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
-  background: light-dark(#f4f4f2, #111111);
-  color: light-dark(#111111, #f2f2f2);
+  background: light-dark(#ecebe7, #0d0d0d);
+  color: light-dark(#1a1a1a, #f2f2f2);
+
+  --tile: #1d1d1d;
+  --tile-split: rgb(0 0 0 / 0.7);
+  --flap-text: #ffb31a;
+  --cell: clamp(14px, 5vw, 44px);
 }
 
 body {
@@ -12,6 +17,66 @@ body {
   place-items: center;
 }
 
-.placeholder {
-  text-align: center;
+.board {
+  padding: 24px;
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: calc(var(--cell) * 0.25);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--cell) * 0.4);
+}
+
+.time,
+.name {
+  display: flex;
+  gap: 2px;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--cell) * 0.72);
+  height: var(--cell);
+  border-radius: 3px;
+  background: var(--tile);
+  color: var(--flap-text);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: calc(var(--cell) * 0.68);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* The thin line across the middle of each split-flap tile */
+.cell::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background: var(--tile-split);
+}
+
+.offset {
+  min-width: 6ch;
+  font-size: calc(var(--cell) * 0.32);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

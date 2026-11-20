@@ -20,6 +20,10 @@ reviews:
         Pure logic. Must not touch the DOM or browser storage (document, window,
         localStorage). Every exported function needs a doc comment and tests in
         src/zones.test.ts. Time-zone maths must use Intl, never hard-coded offsets.
+    - path: "src/board.ts"
+      instructions: >-
+        Pure logic. Must not touch the DOM or browser storage. Every exported
+        function needs a doc comment and tests in src/board.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
