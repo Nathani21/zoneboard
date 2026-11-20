@@ -49,6 +49,11 @@ export function boardRow(date: Date, city: City): BoardRow {
   }
 }
 
+/** All of a row's tiles in order: the five time tiles, then the name tiles. */
+export function rowCells(row: BoardRow): string[] {
+  return [...Array.from(row.time), ...row.nameCells]
+}
+
 /** Milliseconds from `date` until the next whole minute (never 0). */
 export function msUntilNextMinute(date: Date): number {
   return 60_000 - (date.getTime() % 60_000)
