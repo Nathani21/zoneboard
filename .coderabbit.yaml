@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: "Explain the why behind each suggestion. The author is learning, so keep it clear and concrete."
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!**/*.png"
+    - "!**/*.svg"
+    - "!**/package-lock.json"
+    - "!dist/**"
+  path_instructions:
+    - path: "src/zones.ts"
+      instructions: >-
+        Pure logic. Must not touch the DOM or browser storage (document, window,
+        localStorage). Every exported function needs a doc comment and tests in
+        src/zones.test.ts. Time-zone maths must use Intl, never hard-coded offsets.
+    - path: "src/**/*.test.ts"
+      instructions: >-
+        Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
+        never new Date() with no arguments, so results don't depend on when or
+        where the tests run.
+    - path: "src/main.ts"
+      instructions: >-
+        UI only. Logic belongs in a pure, tested module. Flag any innerHTML that
+        includes user-provided or search-result text (XSS risk).
+    - path: ".github/workflows/**"
+      instructions: >-
+        The job must stay named "test", because branch protection requires that check.
+
+chat:
+  auto_reply: true
