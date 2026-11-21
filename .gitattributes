@@ -1,0 +1,7 @@
+# Store and check out text files with LF line endings on every OS,
+# so Windows, CI (Linux) and Vercel all see identical files.
+* text=auto eol=lf
+
+# Images are binary: never convert them.
+*.png binary
+*.ico binary
