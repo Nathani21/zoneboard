@@ -10,6 +10,15 @@
   --cell: clamp(14px, 5vw, 44px);
 }
 
+/* The theme switch overrides the system setting; light-dark() follows color-scheme */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -171,12 +180,49 @@ body {
   opacity: 0.7;
 }
 
+.site-footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 0 24px 20px;
+}
+
 .privacy-note {
   margin: 0;
-  padding: 0 24px 20px;
   font-size: 0.8rem;
   text-align: center;
   opacity: 0.6;
+}
+
+.theme-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 999px;
+}
+
+.theme-switch button {
+  padding: 0.3rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.theme-switch button[aria-pressed='true'] {
+  background: light-dark(#ffffff, #2a2a2a);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+  opacity: 1;
+}
+
+.theme-switch button:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
 }
 
 .sr-only {

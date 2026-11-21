@@ -6,10 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>zoneboard</title>
     <meta name="description" content="A split-flap departure board for world time zones." />
+    <script>
+      // Apply a saved Light/Dark choice before the page draws, so it doesn't flash the wrong theme.
+      // The key must match THEME_KEY in src/storage.ts (a test checks this).
+      try {
+        const theme = localStorage.getItem('zoneboard:theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="app"></div>
-    <footer class="privacy-note">Your city list is saved only in this browser. It is never sent to a server.</footer>
+    <footer class="site-footer">
+      <p class="privacy-note">Your city list is saved only in this browser. It is never sent to a server.</p>
+    </footer>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

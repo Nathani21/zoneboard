@@ -14,7 +14,15 @@ import {
 import { CITIES, type Place } from './cities'
 import { scrambleFrame, scrambleLength } from './scramble'
 import { resultDetail, searchCities } from './search'
-import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
+import {
+  parseSavedCities,
+  parseTheme,
+  serializeCities,
+  STORAGE_KEY,
+  THEME_KEY,
+  THEMES,
+  type Theme,
+} from './storage'
 
 /** How long each scramble frame stays on screen. */
 const FRAME_MS = 50
@@ -347,6 +355,66 @@ document.addEventListener('visibilitychange', () => {
     update(new Date())
   }
 })
+
+// ---- Theme: System / Light / Dark ----
+
+const THEME_LABELS: Record<Theme, string> = { system: 'System', light: 'Light', dark: 'Dark' }
+
+/** 'system' removes the override, so the page follows the operating system again. */
+function applyTheme(theme: Theme): void {
+  if (theme === 'system') {
+    delete document.documentElement.dataset.theme
+  } else {
+    document.documentElement.dataset.theme = theme
+  }
+}
+
+function loadTheme(): Theme {
+  try {
+    return parseTheme(localStorage.getItem(THEME_KEY))
+  } catch {
+    return 'system'
+  }
+}
+
+function saveTheme(theme: Theme): void {
+  try {
+    localStorage.setItem(THEME_KEY, theme)
+  } catch {
+    // Storage blocked: the theme still changes, it just isn't remembered
+  }
+}
+
+let theme = loadTheme()
+
+const themeSwitch = document.createElement('div')
+themeSwitch.className = 'theme-switch'
+themeSwitch.setAttribute('role', 'group')
+themeSwitch.setAttribute('aria-label', 'Theme')
+
+const themeButtons = THEMES.map((option) => {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.textContent = THEME_LABELS[option]
+  button.addEventListener('click', () => {
+    theme = option
+    applyTheme(theme)
+    saveTheme(theme)
+    updateThemeButtons()
+  })
+  themeSwitch.append(button)
+  return button
+})
+
+function updateThemeButtons(): void {
+  THEMES.forEach((option, index) => {
+    themeButtons[index].setAttribute('aria-pressed', String(option === theme))
+  })
+}
+
+document.querySelector('.site-footer')?.prepend(themeSwitch)
+applyTheme(theme)
+updateThemeButtons()
 
 updateRemoveButtons()
 tick()
