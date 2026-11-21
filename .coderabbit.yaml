@@ -36,6 +36,10 @@ reviews:
       instructions: >-
         Pure logic. Must not touch the DOM. Matching must ignore case and accents.
         Tests in src/search.test.ts.
+    - path: "src/storage.ts"
+      instructions: >-
+        Pure: converts the board to and from text, never calls localStorage itself.
+        Saved data is untrusted input and must be fully validated. Tests in src/storage.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
