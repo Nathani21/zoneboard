@@ -72,6 +72,69 @@ body {
   opacity: 0.6;
 }
 
+.search {
+  position: relative;
+  max-width: 26rem;
+  margin-top: calc(var(--cell) * 0.9);
+}
+
+.search input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 999px;
+  background: light-dark(#ffffff, #181818);
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.search input:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+.results {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 12px;
+  background: light-dark(#ffffff, #181818);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.results li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.results li[aria-selected='true'] {
+  background: light-dark(#f0eee7, #2a2a2a);
+}
+
+.result-detail {
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
+.search-status {
+  min-height: 1.2em;
+  margin: 0.4rem 0 0 1rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

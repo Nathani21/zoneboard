@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { boardRow, DEFAULT_CITIES, msUntilNextMinute, NAME_CELLS, rowCells, toCells } from './board'
+import {
+  addCity,
+  boardRow,
+  DEFAULT_CITIES,
+  MAX_ROWS,
+  msUntilNextMinute,
+  NAME_CELLS,
+  rowCells,
+  sameCity,
+  toCells,
+  withoutCities,
+  type City,
+} from './board'
 import { isValidTimeZone } from './zones'
 
 const at = (iso: string) => new Date(iso)
@@ -62,5 +74,45 @@ describe('msUntilNextMinute', () => {
     ['2026-10-04T13:28:59.999Z', 1],
   ])('at %s waits %i ms', (iso, expected) => {
     expect(msUntilNextMinute(at(iso))).toBe(expected)
+  })
+})
+
+
+const city = (name: string, timeZone = 'UTC'): City => ({ name, timeZone })
+
+describe('sameCity', () => {
+  it('matches on name and time zone', () => {
+    expect(sameCity(city('Lagos', 'Africa/Lagos'), city('Lagos', 'Africa/Lagos'))).toBe(true)
+    expect(sameCity(city('Lagos', 'Africa/Lagos'), city('Lagos', 'UTC'))).toBe(false)
+    expect(sameCity(city('Lagos'), city('Abuja'))).toBe(false)
+  })
+})
+
+describe('addCity', () => {
+  it('adds a new city at the bottom without changing the original list', () => {
+    const board = [city('A'), city('B')]
+    expect(addCity(board, city('C'))).toEqual([city('A'), city('B'), city('C')])
+    expect(board).toHaveLength(2)
+  })
+
+  it('returns the same list when the city is already on the board', () => {
+    const board = [city('A'), city('B')]
+    expect(addCity(board, city('B'))).toBe(board)
+  })
+
+  it('returns the same list when the board is full', () => {
+    const board = Array.from({ length: MAX_ROWS }, (_, i) => city(`City ${i}`))
+    expect(addCity(board, city('One too many'))).toBe(board)
+  })
+})
+
+describe('withoutCities', () => {
+  it('removes cities that are already on the board', () => {
+    const places = [city('A'), city('B'), city('C')]
+    expect(withoutCities(places, [city('B')])).toEqual([city('A'), city('C')])
+  })
+
+  it('keeps everything when the board is empty', () => {
+    expect(withoutCities([city('A')], [])).toEqual([city('A')])
   })
 })

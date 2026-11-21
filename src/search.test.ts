@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Place } from './cities'
-import { normalize, searchCities } from './search'
+import { normalize, resultDetail, searchCities } from './search'
 
 const place = (name: string, country = 'Testland'): Place => ({
   name,
@@ -76,5 +76,13 @@ describe('searchCities', () => {
 
   it('returns at most `limit` results', () => {
     expect(searchCities('s', PLACES, 2)).toHaveLength(2)
+  })
+})
+
+describe('resultDetail', () => {
+  it('shows the country and the offset at that moment', () => {
+    const sf: Place = { name: 'San Francisco', country: 'USA', timeZone: 'America/Los_Angeles' }
+    expect(resultDetail(sf, new Date('2026-01-15T12:00:00Z'))).toBe('USA · GMT-8')
+    expect(resultDetail(sf, new Date('2026-07-15T12:00:00Z'))).toBe('USA · GMT-7')
   })
 })
