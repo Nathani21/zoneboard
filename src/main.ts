@@ -6,6 +6,7 @@ import {
   MAX_ROWS,
   msUntilNextMinute,
   NAME_CELLS,
+  removeCity,
   rowCells,
   withoutCities,
   type City,
@@ -13,6 +14,7 @@ import {
 import { CITIES, type Place } from './cities'
 import { scrambleFrame, scrambleLength } from './scramble'
 import { resultDetail, searchCities } from './search'
+import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 
 /** How long each scramble frame stays on screen. */
 const FRAME_MS = 50
@@ -23,6 +25,8 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 /** One row on the page, kept between updates so only changed tiles animate. */
 interface RowView {
   city: City
+  item: HTMLLIElement
+  remove: HTMLButtonElement
   cells: HTMLSpanElement[]
   offset: HTMLSpanElement
   spoken: HTMLSpanElement
@@ -73,11 +77,28 @@ function createRow(city: City): RowView {
   offset.className = 'offset'
   offset.setAttribute('aria-hidden', 'true')
 
-  item.append(spoken, timeGroup, nameGroup, offset)
+  const remove = document.createElement('button')
+  remove.type = 'button'
+  remove.className = 'remove'
+  remove.textContent = '×'
+  remove.setAttribute('aria-label', `Remove ${city.name}`)
+
+  item.append(spoken, timeGroup, nameGroup, offset, remove)
   list.append(item)
 
   const cells = [...timeCells, ...nameCells]
-  return { city, cells, offset, spoken, target: cells.map(() => ' '), animation: 0 }
+  const view: RowView = {
+    city,
+    item,
+    remove,
+    cells,
+    offset,
+    spoken,
+    target: cells.map(() => ' '),
+    animation: 0,
+  }
+  remove.addEventListener('click', () => removeRow(view))
+  return view
 }
 
 /** Put characters on the tiles, touching only tiles that change. */
@@ -122,8 +143,50 @@ function animateTo(view: RowView, target: string[]): void {
   requestAnimationFrame(step)
 }
 
-let cities: readonly City[] = DEFAULT_CITIES
+/** The visitor's saved cities, or the defaults. Storage can be blocked, so failures fall back. */
+function loadCities(): readonly City[] {
+  try {
+    return parseSavedCities(localStorage.getItem(STORAGE_KEY)) ?? DEFAULT_CITIES
+  } catch {
+    return DEFAULT_CITIES
+  }
+}
+
+function saveCities(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, serializeCities(cities))
+  } catch {
+    // Storage blocked (some private modes or settings): the board still works, it just isn't remembered
+  }
+}
+
+let cities: readonly City[] = loadCities()
 const views = cities.map(createRow)
+
+/** The last city can't be removed, so hide its button. */
+function updateRemoveButtons(): void {
+  for (const view of views) {
+    view.remove.disabled = cities.length <= 1
+  }
+}
+
+function removeRow(view: RowView): void {
+  const next = removeCity(cities, view.city)
+  if (next === cities) {
+    return
+  }
+  cities = next
+  const index = views.indexOf(view)
+  views.splice(index, 1)
+  view.animation++ // stop any animation still running on this row
+  view.item.remove()
+  saveCities()
+  updateRemoveButtons()
+  status.textContent = `Removed ${view.city.name}.`
+  // Keep keyboard focus nearby instead of losing it with the removed button
+  const neighbour = views[index] ?? views[index - 1]
+  neighbour.remove.focus()
+}
 
 function updateView(view: RowView, now: Date): void {
   const row = boardRow(now, view.city)
@@ -241,6 +304,8 @@ function choose(place: Place): void {
   const view = createRow(place)
   views.push(view)
   updateView(view, new Date())
+  saveCities()
+  updateRemoveButtons()
   input.value = ''
   closeResults()
   status.textContent = `Added ${place.name}.`
@@ -283,4 +348,5 @@ document.addEventListener('visibilitychange', () => {
   }
 })
 
+updateRemoveButtons()
 tick()

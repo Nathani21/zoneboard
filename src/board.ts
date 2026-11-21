@@ -46,6 +46,17 @@ export function addCity(cities: readonly City[], city: City): readonly City[] {
   return [...cities, city]
 }
 
+/**
+ * The board without `city`. Returns the same array, unchanged, if the city
+ * isn't on the board or it's the last one left (the board never goes empty).
+ */
+export function removeCity(cities: readonly City[], city: City): readonly City[] {
+  if (cities.length <= 1 || !cities.some((onBoard) => sameCity(onBoard, city))) {
+    return cities
+  }
+  return cities.filter((onBoard) => !sameCity(onBoard, city))
+}
+
 /** `places` without the cities already on the board, so search doesn't offer them again. */
 export function withoutCities<T extends City>(places: readonly T[], onBoard: readonly City[]): T[] {
   return places.filter((place) => !onBoard.some((city) => sameCity(city, place)))

@@ -6,6 +6,7 @@ import {
   MAX_ROWS,
   msUntilNextMinute,
   NAME_CELLS,
+  removeCity,
   rowCells,
   sameCity,
   toCells,
@@ -103,6 +104,24 @@ describe('addCity', () => {
   it('returns the same list when the board is full', () => {
     const board = Array.from({ length: MAX_ROWS }, (_, i) => city(`City ${i}`))
     expect(addCity(board, city('One too many'))).toBe(board)
+  })
+})
+
+describe('removeCity', () => {
+  it('removes the city without changing the original list', () => {
+    const board = [city('A'), city('B'), city('C')]
+    expect(removeCity(board, city('B'))).toEqual([city('A'), city('C')])
+    expect(board).toHaveLength(3)
+  })
+
+  it('returns the same list when the city is not on the board', () => {
+    const board = [city('A'), city('B')]
+    expect(removeCity(board, city('Z'))).toBe(board)
+  })
+
+  it('never removes the last city', () => {
+    const board = [city('A')]
+    expect(removeCity(board, city('A'))).toBe(board)
   })
 })
 
