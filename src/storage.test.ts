@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import indexHtml from '../index.html?raw'
 import { MAX_ROWS, type City } from './board'
-import { parseSavedCities, serializeCities } from './storage'
+import { parseSavedCities, parseTheme, serializeCities, THEME_KEY, THEMES } from './storage'
 
 const lagos: City = { name: 'Lagos', timeZone: 'Africa/Lagos' }
 const tokyo: City = { name: 'Tokyo', timeZone: 'Asia/Tokyo' }
@@ -48,5 +49,20 @@ describe('parseSavedCities', () => {
   it(`keeps at most ${MAX_ROWS} cities`, () => {
     const many = Array.from({ length: MAX_ROWS + 3 }, (_, i) => ({ name: `City ${i}`, timeZone: 'UTC' }))
     expect(parseSavedCities(JSON.stringify(many))).toHaveLength(MAX_ROWS)
+  })
+})
+
+
+describe('parseTheme', () => {
+  it.each(THEMES)('keeps a saved %s', (theme) => {
+    expect(parseTheme(theme)).toBe(theme)
+  })
+
+  it.each([null, '', 'blue', 'LIGHT'])('falls back to system for %j', (text) => {
+    expect(parseTheme(text)).toBe('system')
+  })
+
+  it('uses the same key as the early script in index.html', () => {
+    expect(indexHtml).toContain(`'${THEME_KEY}'`)
   })
 })

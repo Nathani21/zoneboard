@@ -10,6 +10,19 @@ import { isValidTimeZone } from './zones'
 /** The localStorage key the board's cities are saved under. */
 export const STORAGE_KEY = 'zoneboard:cities'
 
+/** The localStorage key the theme choice is saved under (index.html reads it too). */
+export const THEME_KEY = 'zoneboard:theme'
+
+/** The theme choices, in the order the switch shows them. */
+export const THEMES = ['system', 'light', 'dark'] as const
+
+export type Theme = (typeof THEMES)[number]
+
+/** The saved theme, or 'system' if nothing valid is saved. */
+export function parseTheme(text: string | null): Theme {
+  return THEMES.find((theme) => theme === text) ?? 'system'
+}
+
 /** The board as JSON, keeping only each city's name and time zone. */
 export function serializeCities(cities: readonly City[]): string {
   return JSON.stringify(cities.map(({ name, timeZone }) => ({ name, timeZone })))
