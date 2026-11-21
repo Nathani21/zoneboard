@@ -1,4 +1,5 @@
 import type { Place } from './cities'
+import { formatOffset, utcOffsetMinutes } from './zones'
 
 /**
  * Lower-cases, trims, collapses spaces and strips accents, so "  SÃO  paulo"
@@ -50,4 +51,9 @@ export function searchCities(query: string, places: readonly Place[], limit = 6)
     .sort((a, b) => a.rank - b.rank || a.place.name.localeCompare(b.place.name, 'en'))
     .slice(0, limit)
     .map((match) => match.place)
+}
+
+/** The small text under a search result, e.g. "USA · GMT-8". */
+export function resultDetail(place: Place, date: Date): string {
+  return `${place.country} · ${formatOffset(utcOffsetMinutes(date, place.timeZone))}`
 }

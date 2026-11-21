@@ -1,13 +1,18 @@
 import './style.css'
 import {
+  addCity,
   boardRow,
   DEFAULT_CITIES,
+  MAX_ROWS,
   msUntilNextMinute,
   NAME_CELLS,
   rowCells,
+  withoutCities,
   type City,
 } from './board'
+import { CITIES, type Place } from './cities'
 import { scrambleFrame, scrambleLength } from './scramble'
+import { resultDetail, searchCities } from './search'
 
 /** How long each scramble frame stays on screen. */
 const FRAME_MS = 50
@@ -117,16 +122,151 @@ function animateTo(view: RowView, target: string[]): void {
   requestAnimationFrame(step)
 }
 
-const views = DEFAULT_CITIES.map(createRow)
+let cities: readonly City[] = DEFAULT_CITIES
+const views = cities.map(createRow)
+
+function updateView(view: RowView, now: Date): void {
+  const row = boardRow(now, view.city)
+  view.spoken.textContent = `${row.name}: ${row.time}, ${row.offset}`
+  view.offset.textContent = row.offset
+  animateTo(view, rowCells(row))
+}
 
 function update(now: Date): void {
   for (const view of views) {
-    const row = boardRow(now, view.city)
-    view.spoken.textContent = `${row.name}: ${row.time}, ${row.offset}`
-    view.offset.textContent = row.offset
-    animateTo(view, rowCells(row))
+    updateView(view, now)
   }
 }
+
+
+// ---- Search: type a city, pick a result, and it joins the board ----
+
+const search = document.createElement('div')
+search.className = 'search'
+
+const input = document.createElement('input')
+input.type = 'search'
+input.placeholder = 'Add a city'
+input.autocomplete = 'off'
+input.spellcheck = false
+input.setAttribute('aria-label', 'Add a city')
+input.setAttribute('role', 'combobox')
+input.setAttribute('aria-autocomplete', 'list')
+input.setAttribute('aria-controls', 'search-results')
+input.setAttribute('aria-expanded', 'false')
+
+const results = document.createElement('ul')
+results.id = 'search-results'
+results.className = 'results'
+results.setAttribute('role', 'listbox')
+results.hidden = true
+
+const status = document.createElement('p')
+status.className = 'search-status'
+status.setAttribute('aria-live', 'polite')
+
+search.append(input, results, status)
+board.append(search)
+
+let matches: Place[] = []
+let active = -1
+
+function renderResults(): void {
+  const now = new Date()
+  results.replaceChildren(
+    ...matches.map((place, index) => {
+      const option = document.createElement('li')
+      option.id = `search-result-${index}`
+      option.setAttribute('role', 'option')
+      option.setAttribute('aria-selected', String(index === active))
+
+      const name = document.createElement('span')
+      name.className = 'result-name'
+      name.textContent = place.name
+
+      const detail = document.createElement('span')
+      detail.className = 'result-detail'
+      detail.textContent = resultDetail(place, now)
+
+      option.append(name, detail)
+      // mousedown, not click: keeps focus in the input so the list doesn't close first
+      option.addEventListener('mousedown', (event) => {
+        event.preventDefault()
+        choose(place)
+      })
+      return option
+    }),
+  )
+  const open = matches.length > 0
+  results.hidden = !open
+  input.setAttribute('aria-expanded', String(open))
+  if (open && active >= 0) {
+    input.setAttribute('aria-activedescendant', `search-result-${active}`)
+  } else {
+    input.removeAttribute('aria-activedescendant')
+  }
+}
+
+function runSearch(): void {
+  const query = input.value
+  if (cities.length >= MAX_ROWS) {
+    matches = []
+    status.textContent = query.trim() ? `The board is full (${MAX_ROWS} cities).` : ''
+  } else {
+    matches = searchCities(query, withoutCities(CITIES, cities))
+    if (!query.trim() || matches.length > 0) {
+      status.textContent = ''
+    } else if (searchCities(query, CITIES).length > 0) {
+      status.textContent = 'Already on the board.'
+    } else {
+      status.textContent = 'No matching city.'
+    }
+  }
+  active = matches.length > 0 ? 0 : -1
+  renderResults()
+}
+
+function closeResults(): void {
+  matches = []
+  active = -1
+  renderResults()
+}
+
+function choose(place: Place): void {
+  const next = addCity(cities, place)
+  if (next === cities) {
+    return
+  }
+  cities = next
+  const view = createRow(place)
+  views.push(view)
+  updateView(view, new Date())
+  input.value = ''
+  closeResults()
+  status.textContent = `Added ${place.name}.`
+}
+
+input.addEventListener('input', runSearch)
+input.addEventListener('focus', runSearch)
+input.addEventListener('blur', closeResults)
+input.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    if (matches.length === 0) {
+      return
+    }
+    event.preventDefault()
+    const step = event.key === 'ArrowDown' ? 1 : -1
+    active = (active + step + matches.length) % matches.length
+    renderResults()
+  } else if (event.key === 'Enter' && active >= 0) {
+    event.preventDefault()
+    choose(matches[active])
+  } else if (event.key === 'Escape') {
+    input.value = ''
+    status.textContent = ''
+    closeResults()
+  }
+})
 
 /** Update now, then again just after each minute changes. */
 function tick(): void {

@@ -27,6 +27,30 @@ export const DEFAULT_CITIES: readonly City[] = [
 /** Number of character tiles in the city-name column. */
 export const NAME_CELLS = 13
 
+/** Most rows the board shows. */
+export const MAX_ROWS = 8
+
+/** True if both are the same city (same name and time zone). */
+export function sameCity(a: City, b: City): boolean {
+  return a.name === b.name && a.timeZone === b.timeZone
+}
+
+/**
+ * The board with `city` added at the bottom. Returns the same array, unchanged,
+ * if the city is already on the board or the board is full.
+ */
+export function addCity(cities: readonly City[], city: City): readonly City[] {
+  if (cities.length >= MAX_ROWS || cities.some((onBoard) => sameCity(onBoard, city))) {
+    return cities
+  }
+  return [...cities, city]
+}
+
+/** `places` without the cities already on the board, so search doesn't offer them again. */
+export function withoutCities<T extends City>(places: readonly T[], onBoard: readonly City[]): T[] {
+  return places.filter((place) => !onBoard.some((city) => sameCity(city, place)))
+}
+
 /**
  * Splits text into exactly `width` upper-case cells: shorter text is padded
  * with spaces, longer text is cut off.
