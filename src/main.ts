@@ -3,8 +3,8 @@ import { DEFAULT_CITIES, msUntilNextMinute } from './board'
 import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 import { createBoardView } from './ui/board-view'
 import { readStorage, writeStorage } from './ui/local-storage'
+import { createMenuItems } from './ui/menu-items'
 import { createSearchBox } from './ui/search-box'
-import { createThemeSwitch } from './ui/theme-switch'
 import { createTopBar } from './ui/top-bar'
 
 const app = document.querySelector<HTMLDivElement>('#app')
@@ -26,15 +26,7 @@ const main = document.createElement('main')
 main.className = 'board'
 main.append(board.element, search.element)
 
-const themeLabel = document.createElement('p')
-themeLabel.className = 'menu-label'
-themeLabel.textContent = 'Theme'
-
-const privacyNote = document.createElement('p')
-privacyNote.className = 'privacy-note'
-privacyNote.textContent = 'Your city list is saved only in this browser. It is never sent to a server.'
-
-app.replaceChildren(createTopBar([themeLabel, createThemeSwitch(), privacyNote]), main)
+app.replaceChildren(createTopBar(createMenuItems()), main)
 
 /** Update now, then again just after each minute changes. */
 function tick(): void {
