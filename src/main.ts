@@ -1,5 +1,6 @@
 import './style.css'
 import { DEFAULT_CITIES, msUntilNextMinute } from './board'
+import { resolveHomeTimeZone } from './home'
 import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 import { createBoardView } from './ui/board-view'
 import { createBottomBar } from './ui/bottom-bar'
@@ -24,8 +25,8 @@ const search = createSearchBox({
   onClose: (reason) => bottomBar.closeSearch(reason === 'escape'),
 })
 
-// The visitor's own time zone, e.g. "Africa/Lagos" (UTC if the browser won't say)
-const homeTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+// The visitor's own time zone, e.g. "Africa/Lagos"
+const homeTimeZone = resolveHomeTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
 const bottomBar = createBottomBar(search, homeTimeZone)
 
 const main = document.createElement('main')
