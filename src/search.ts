@@ -1,3 +1,4 @@
+import { MAX_ROWS, withoutCities, type City } from './board'
 import type { Place } from './cities'
 import { formatOffset, utcOffsetMinutes } from './zones'
 
@@ -56,4 +57,39 @@ export function searchCities(query: string, places: readonly Place[], limit = 6)
 /** The small text under a search result, e.g. "USA · GMT-8". */
 export function resultDetail(place: Place, date: Date): string {
   return `${place.country} · ${formatOffset(utcOffsetMinutes(date, place.timeZone))}`
+}
+
+
+/** What a search for a city to add came to, so the search box knows what to say. */
+export type SearchOutcome = 'empty' | 'results' | 'full' | 'on-board' | 'no-match'
+
+export interface CitiesToAdd {
+  matches: Place[]
+  outcome: SearchOutcome
+}
+
+/**
+ * Cities matching `query` that can still be added to the board, and why the
+ * list is empty when it is: a blank query, a full board, every match already
+ * on the board, or no match at all.
+ */
+export function findCitiesToAdd(
+  query: string,
+  places: readonly Place[],
+  onBoard: readonly City[],
+  maxRows = MAX_ROWS,
+): CitiesToAdd {
+  const blank = query.trim() === ''
+  if (onBoard.length >= maxRows) {
+    return { matches: [], outcome: blank ? 'empty' : 'full' }
+  }
+  if (blank) {
+    return { matches: [], outcome: 'empty' }
+  }
+  const matches = searchCities(query, withoutCities(places, onBoard))
+  if (matches.length > 0) {
+    return { matches, outcome: 'results' }
+  }
+  const outcome = searchCities(query, places).length > 0 ? 'on-board' : 'no-match'
+  return { matches: [], outcome }
 }

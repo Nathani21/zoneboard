@@ -1,6 +1,15 @@
-import { MAX_ROWS, withoutCities, type City } from '../board'
+import { MAX_ROWS, type City } from '../board'
 import { CITIES, type Place } from '../cities'
-import { resultDetail, searchCities } from '../search'
+import { findCitiesToAdd, resultDetail, type SearchOutcome } from '../search'
+
+/** What the status line under the box says for each search outcome. */
+const MESSAGES: Record<SearchOutcome, string> = {
+  empty: '',
+  results: '',
+  full: `The board is full (${MAX_ROWS} cities).`,
+  'on-board': 'Already on the board.',
+  'no-match': 'No matching city.',
+}
 
 export interface SearchBoxOptions {
   /** The cities currently on the board (they're left out of the results). */
@@ -84,21 +93,9 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
   }
 
   function runSearch(): void {
-    const query = input.value
-    const cities = options.cities()
-    if (cities.length >= MAX_ROWS) {
-      matches = []
-      status.textContent = query.trim() ? `The board is full (${MAX_ROWS} cities).` : ''
-    } else {
-      matches = searchCities(query, withoutCities(CITIES, cities))
-      if (!query.trim() || matches.length > 0) {
-        status.textContent = ''
-      } else if (searchCities(query, CITIES).length > 0) {
-        status.textContent = 'Already on the board.'
-      } else {
-        status.textContent = 'No matching city.'
-      }
-    }
+    const result = findCitiesToAdd(input.value, CITIES, options.cities())
+    matches = result.matches
+    status.textContent = MESSAGES[result.outcome]
     active = matches.length > 0 ? 0 : -1
     renderResults()
   }
