@@ -204,10 +204,101 @@ body {
   visibility: hidden;
 }
 
+.bottom-bar {
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  pointer-events: none; /* let clicks through the empty parts of the bar */
+}
+
+.bottom-bar > * {
+  pointer-events: auto;
+}
+
+/* Centred on the screen, whatever is on the left */
+.bottom-centre {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+}
+
+.chip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 40px;
+  margin: 0;
+  padding: 0 1rem;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 999px;
+  background: light-dark(#ffffff, #181818);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.zone-button {
+  cursor: pointer;
+}
+
+.zone-button:hover {
+  border-color: light-dark(#a9a59b, #555555);
+}
+
+.zone-button:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+.zone-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.zone-button[hidden],
+.search[hidden] {
+  display: none;
+}
+
+/* Narrow screens: date on the left, time zone button on the right,
+   and the open search box takes the whole bar */
+@media (max-width: 560px) {
+  .bottom-bar {
+    justify-content: space-between;
+  }
+
+  .bottom-centre {
+    position: static;
+    transform: none;
+  }
+
+  .bottom-bar.searching .date-chip {
+    display: none;
+  }
+
+  .bottom-bar.searching .bottom-centre {
+    flex: 1;
+  }
+}
+
 .search {
   position: relative;
-  max-width: 26rem;
-  margin-top: calc(var(--cell) * 0.9);
+  width: min(26rem, calc(100vw - 32px));
 }
 
 .search input {
@@ -261,9 +352,14 @@ body {
 }
 
 .search-status {
-  min-height: 1.2em;
-  margin: 0.4rem 0 0 1rem;
+  /* Floats just above the bar, so it never pushes the bar's buttons around */
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
   font-size: 0.85rem;
+  white-space: nowrap;
   opacity: 0.7;
 }
 

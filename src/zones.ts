@@ -51,3 +51,17 @@ export function formatOffset(minutes: number): string {
     ? `GMT${sign}${hours}`
     : `GMT${sign}${hours}:${String(mins).padStart(2, '0')}`
 }
+
+
+/**
+ * Short date in the given zone, e.g. "Wed 25 Nov". The locale decides the
+ * order and punctuation; leave it out to use the visitor's own.
+ */
+export function formatDate(date: Date, timeZone: string, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(date)
+}
