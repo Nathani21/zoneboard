@@ -325,7 +325,8 @@ body {
 .results {
   position: absolute;
   z-index: 1;
-  top: calc(100% + 6px);
+  /* The search sits at the bottom of the screen, so results open upwards */
+  bottom: calc(100% + 6px);
   left: 0;
   right: 0;
   margin: 0;
