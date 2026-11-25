@@ -5,6 +5,7 @@ import { createBoardView } from './ui/board-view'
 import { readStorage, writeStorage } from './ui/local-storage'
 import { createSearchBox } from './ui/search-box'
 import { createThemeSwitch } from './ui/theme-switch'
+import { createTopBar } from './ui/top-bar'
 
 const app = document.querySelector<HTMLDivElement>('#app')
 if (!app) {
@@ -24,9 +25,16 @@ const search = createSearchBox({
 const main = document.createElement('main')
 main.className = 'board'
 main.append(board.element, search.element)
-app.replaceChildren(main)
 
-document.querySelector('.site-footer')?.prepend(createThemeSwitch())
+const themeLabel = document.createElement('p')
+themeLabel.className = 'menu-label'
+themeLabel.textContent = 'Theme'
+
+const privacyNote = document.createElement('p')
+privacyNote.className = 'privacy-note'
+privacyNote.textContent = 'Your city list is saved only in this browser. It is never sent to a server.'
+
+app.replaceChildren(createTopBar([themeLabel, createThemeSwitch(), privacyNote]), main)
 
 /** Update now, then again just after each minute changes. */
 function tick(): void {

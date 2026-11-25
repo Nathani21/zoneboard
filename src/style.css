@@ -20,11 +20,97 @@
 }
 
 body {
+  box-sizing: border-box;
   margin: 0;
   min-height: 100vh;
+  /* Room above and below the board for the top bar */
+  padding: 72px 0;
   display: grid;
-  grid-template-rows: 1fr auto;
   place-items: center;
+}
+
+.top-bar {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  pointer-events: none; /* let clicks through the empty middle of the bar */
+}
+
+.top-bar-group {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.icon-button {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 50%;
+  background: light-dark(#ffffff, #181818);
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-button:hover {
+  border-color: light-dark(#a9a59b, #555555);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  display: grid;
+  gap: 0.6rem;
+  width: min(280px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 16px;
+  background: light-dark(#ffffff, #181818);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.menu-panel[hidden] {
+  display: none;
+}
+
+.menu-label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
 }
 
 .board {
@@ -180,22 +266,15 @@ body {
   opacity: 0.7;
 }
 
-.site-footer {
-  display: grid;
-  justify-items: center;
-  gap: 0.6rem;
-  padding: 0 24px 20px;
-}
-
 .privacy-note {
-  margin: 0;
+  margin: 0.4rem 0 0;
   font-size: 0.8rem;
-  text-align: center;
   opacity: 0.6;
 }
 
 .theme-switch {
-  display: inline-flex;
+  display: flex;
+  justify-self: start;
   gap: 2px;
   padding: 3px;
   border: 1px solid light-dark(#cfccc4, #333333);
