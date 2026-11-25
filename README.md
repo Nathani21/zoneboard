@@ -56,7 +56,8 @@ The logic is split into small, pure TypeScript modules with no access to the pag
 | `src/cities.ts` | The list of 152 searchable cities |
 | `src/search.ts` | Ranked, accent-insensitive city search |
 | `src/storage.ts` | Saving the board and theme choice, and validating them on load (saved data is treated as untrusted) |
-| `src/main.ts` | The only file that touches the page: builds the board, runs the animation, the search box and the theme switch |
+| `src/ui/` | The only code that touches the page: `board-view.ts` (rows, tiles, animation), `search-box.ts`, `theme-switch.ts`, and `local-storage.ts` (storage that never crashes the app) |
+| `src/main.ts` | Wires the pieces together and runs the clock |
 
 No framework: plain TypeScript, built with [Vite](https://vite.dev) and hosted on [Vercel](https://vercel.com).
 

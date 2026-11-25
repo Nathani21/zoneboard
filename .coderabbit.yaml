@@ -47,8 +47,12 @@ reviews:
         where the tests run.
     - path: "src/main.ts"
       instructions: >-
-        UI only. Logic belongs in a pure, tested module. Flag any innerHTML that
-        includes user-provided or search-result text (XSS risk).
+        Wiring only: creates the pieces from src/ui and runs the clock. No logic here.
+    - path: "src/ui/**"
+      instructions: >-
+        UI only. Logic belongs in a pure, tested module outside src/ui. Flag any
+        innerHTML (text must go through textContent; XSS risk). localStorage only
+        through local-storage.ts.
     - path: ".github/workflows/**"
       instructions: >-
         The job must stay named "test", because branch protection requires that check.
