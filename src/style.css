@@ -287,12 +287,16 @@ body {
     transform: none;
   }
 
-  .bottom-bar.searching .date-chip {
-    display: none;
-  }
-
   .bottom-bar.searching .bottom-centre {
     flex: 1;
+  }
+}
+
+/* The open search box is 416px wide and centred; below 760px it would run
+   into the date, so the date steps aside while searching */
+@media (max-width: 760px) {
+  .bottom-bar.searching .date-chip {
+    display: none;
   }
 }
 

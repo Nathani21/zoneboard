@@ -17,7 +17,7 @@ export interface SearchBoxOptions {
   /** Adds the chosen place; returns false if it couldn't be added. */
   onChoose: (place: Place) => boolean
   /** Called when the visitor is done: Esc, or leaving the box while it's empty. */
-  onClose: () => void
+  onClose: (reason: 'escape' | 'blur') => void
 }
 
 export interface SearchBox {
@@ -140,7 +140,7 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
   input.addEventListener('blur', () => {
     closeResults()
     if (input.value.trim() === '') {
-      options.onClose()
+      options.onClose('blur')
     }
   })
   input.addEventListener('keydown', (event) => {
@@ -159,7 +159,7 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
       input.value = ''
       setStatus('')
       closeResults()
-      options.onClose()
+      options.onClose('escape')
     }
   })
 
