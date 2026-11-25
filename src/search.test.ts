@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Place } from './cities'
-import { normalize, resultDetail, searchCities } from './search'
+import { findCitiesToAdd, normalize, resultDetail, searchCities } from './search'
 
 const place = (name: string, country = 'Testland'): Place => ({
   name,
@@ -84,5 +84,37 @@ describe('resultDetail', () => {
     const sf: Place = { name: 'San Francisco', country: 'USA', timeZone: 'America/Los_Angeles' }
     expect(resultDetail(sf, new Date('2026-01-15T12:00:00Z'))).toBe('USA · GMT-8')
     expect(resultDetail(sf, new Date('2026-07-15T12:00:00Z'))).toBe('USA · GMT-7')
+  })
+})
+
+
+describe('findCitiesToAdd', () => {
+  const sanJuan = PLACES[1]
+  const lagos = PLACES[9]
+
+  it.each(['', '   '])('says nothing for a blank query (%j)', (query) => {
+    expect(findCitiesToAdd(query, PLACES, [])).toEqual({ matches: [], outcome: 'empty' })
+  })
+
+  it('leaves out cities already on the board', () => {
+    const result = findCitiesToAdd('san', PLACES, [sanJuan])
+    expect(result.outcome).toBe('results')
+    expect(names(result.matches)).toEqual(['San Francisco', 'Santiago'])
+  })
+
+  it('says when every match is already on the board', () => {
+    expect(findCitiesToAdd('lagos', PLACES, [lagos])).toEqual({ matches: [], outcome: 'on-board' })
+  })
+
+  it('says when no city matches', () => {
+    expect(findCitiesToAdd('zzz', PLACES, [])).toEqual({ matches: [], outcome: 'no-match' })
+  })
+
+  it('says the board is full instead of searching', () => {
+    expect(findCitiesToAdd('tok', PLACES, [sanJuan, lagos], 2)).toEqual({ matches: [], outcome: 'full' })
+  })
+
+  it('says nothing for a blank query on a full board', () => {
+    expect(findCitiesToAdd('', PLACES, [sanJuan, lagos], 2)).toEqual({ matches: [], outcome: 'empty' })
   })
 })
