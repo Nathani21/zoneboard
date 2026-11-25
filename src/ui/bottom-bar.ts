@@ -9,21 +9,19 @@ export interface BottomBar {
   element: HTMLElement
   /** Refreshes the date and the offset on the time zone button. */
   update: (now: Date) => void
-  /** Swaps the search box back for the time zone button. */
-  closeSearch: () => void
-}
-
-/** The visitor's own IANA time zone, e.g. "Africa/Lagos" (UTC if the browser won't say). */
-function homeTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  /**
+   * Swaps the search box back for the time zone button. With `restoreFocus`
+   * (after Esc), keyboard focus goes back to the button instead of being lost.
+   */
+  closeSearch: (restoreFocus: boolean) => void
 }
 
 /**
  * The bar across the bottom: today's date on the left, and in the middle a
- * button showing the visitor's own time zone that opens the city search.
+ * button showing the visitor's own time zone (`home`, an IANA zone such as
+ * "Africa/Lagos") that opens the city search.
  */
-export function createBottomBar(search: SearchBox): BottomBar {
-  const home = homeTimeZone()
+export function createBottomBar(search: SearchBox, home: string): BottomBar {
 
   const bar = document.createElement('footer')
   bar.className = 'bottom-bar'
@@ -59,10 +57,13 @@ export function createBottomBar(search: SearchBox): BottomBar {
       zoneText.textContent = label
       zoneButton.setAttribute('aria-label', `Your time zone: ${label}. Add a city`)
     },
-    closeSearch() {
+    closeSearch(restoreFocus) {
       search.element.hidden = true
       zoneButton.hidden = false
       bar.classList.remove('searching')
+      if (restoreFocus) {
+        zoneButton.focus()
+      }
     },
   }
 }

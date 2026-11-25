@@ -21,10 +21,12 @@ const board = createBoardView(parseSavedCities(readStorage(STORAGE_KEY)) ?? DEFA
 const search = createSearchBox({
   cities: board.cities,
   onChoose: (place) => board.add(place),
-  onClose: () => bottomBar.closeSearch(),
+  onClose: (reason) => bottomBar.closeSearch(reason === 'escape'),
 })
 
-const bottomBar = createBottomBar(search)
+// The visitor's own time zone, e.g. "Africa/Lagos" (UTC if the browser won't say)
+const homeTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+const bottomBar = createBottomBar(search, homeTimeZone)
 
 const main = document.createElement('main')
 main.className = 'board'
