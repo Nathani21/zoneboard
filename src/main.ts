@@ -2,6 +2,7 @@ import './style.css'
 import { DEFAULT_CITIES, msUntilNextMinute } from './board'
 import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 import { createBoardView } from './ui/board-view'
+import { createBottomBar } from './ui/bottom-bar'
 import { readStorage, writeStorage } from './ui/local-storage'
 import { createMenuItems } from './ui/menu-items'
 import { createSearchBox } from './ui/search-box'
@@ -20,18 +21,22 @@ const board = createBoardView(parseSavedCities(readStorage(STORAGE_KEY)) ?? DEFA
 const search = createSearchBox({
   cities: board.cities,
   onChoose: (place) => board.add(place),
+  onClose: () => bottomBar.closeSearch(),
 })
+
+const bottomBar = createBottomBar(search)
 
 const main = document.createElement('main')
 main.className = 'board'
-main.append(board.element, search.element)
+main.append(board.element)
 
-app.replaceChildren(createTopBar(createMenuItems()), main)
+app.replaceChildren(createTopBar(createMenuItems()), main, bottomBar.element)
 
 /** Update now, then again just after each minute changes. */
 function tick(): void {
   const now = new Date()
   board.update(now)
+  bottomBar.update(now)
   // +50 ms so the timer lands just after the minute ticks over, not just before
   window.setTimeout(tick, msUntilNextMinute(now) + 50)
 }
@@ -39,7 +44,9 @@ function tick(): void {
 // Background tabs pause timers, so catch up as soon as the tab is visible again
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    board.update(new Date())
+    const now = new Date()
+    board.update(now)
+    bottomBar.update(now)
   }
 })
 

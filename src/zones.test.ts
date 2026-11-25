@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatOffset, formatTime, isValidTimeZone, utcOffsetMinutes } from './zones'
+import { formatDate, formatOffset, formatTime, isValidTimeZone, utcOffsetMinutes } from './zones'
 
 const at = (iso: string) => new Date(iso)
 
@@ -72,5 +72,20 @@ describe('isValidTimeZone', () => {
     ['Not/AZone', false],
   ])('%s -> %s', (zone, expected) => {
     expect(isValidTimeZone(zone)).toBe(expected)
+  })
+})
+
+
+describe('formatDate', () => {
+  it('shows weekday, day and month in the given zone', () => {
+    expect(formatDate(at('2026-11-25T12:00:00Z'), 'Africa/Lagos', 'en-GB')).toBe('Wed 25 Nov')
+  })
+
+  it('uses the date in that zone, not in UTC', () => {
+    expect(formatDate(at('2026-11-25T23:30:00Z'), 'Asia/Tokyo', 'en-GB')).toBe('Thu 26 Nov')
+  })
+
+  it('follows the locale', () => {
+    expect(formatDate(at('2026-11-25T12:00:00Z'), 'Africa/Lagos', 'en-US')).toBe('Wed, Nov 25')
   })
 })

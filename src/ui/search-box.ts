@@ -16,14 +16,23 @@ export interface SearchBoxOptions {
   cities: () => readonly City[]
   /** Adds the chosen place; returns false if it couldn't be added. */
   onChoose: (place: Place) => boolean
+  /** Called when the visitor is done: Esc, or leaving the box while it's empty. */
+  onClose: () => void
 }
 
 export interface SearchBox {
-  /** The search box, results list and status line, to put on the page. */
+  /** The search box and its results list, to put on the page. */
   element: HTMLDivElement
-  /** Shows a short message under the box, also read out by screen readers. */
+  /** The status line (kept separate so it stays visible while the box is closed). */
+  status: HTMLParagraphElement
+  /** Shows a short message on the status line, also read out by screen readers. */
   announce: (message: string) => void
+  /** Puts the cursor in the box. */
+  focus: () => void
 }
+
+/** How long a status message stays before it clears itself. */
+const STATUS_MS = 4000
 
 /** "Add a city": type, pick a result, and it joins the board. */
 export function createSearchBox(options: SearchBoxOptions): SearchBox {
@@ -51,10 +60,21 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
   status.className = 'search-status'
   status.setAttribute('aria-live', 'polite')
 
-  search.append(input, results, status)
+  search.append(input, results)
 
   let matches: Place[] = []
   let active = -1
+  let statusTimer = 0
+
+  function setStatus(message: string): void {
+    status.textContent = message
+    window.clearTimeout(statusTimer)
+    if (message) {
+      statusTimer = window.setTimeout(() => {
+        status.textContent = ''
+      }, STATUS_MS)
+    }
+  }
 
   function renderResults(): void {
     const now = new Date()
@@ -95,7 +115,7 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
   function runSearch(): void {
     const result = findCitiesToAdd(input.value, CITIES, options.cities())
     matches = result.matches
-    status.textContent = MESSAGES[result.outcome]
+    setStatus(MESSAGES[result.outcome])
     active = matches.length > 0 ? 0 : -1
     renderResults()
   }
@@ -112,12 +132,17 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
     }
     input.value = ''
     closeResults()
-    status.textContent = `Added ${place.name}.`
+    setStatus(`Added ${place.name}.`)
   }
 
   input.addEventListener('input', runSearch)
   input.addEventListener('focus', runSearch)
-  input.addEventListener('blur', closeResults)
+  input.addEventListener('blur', () => {
+    closeResults()
+    if (input.value.trim() === '') {
+      options.onClose()
+    }
+  })
   input.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       if (matches.length === 0) {
@@ -132,15 +157,16 @@ export function createSearchBox(options: SearchBoxOptions): SearchBox {
       choose(matches[active])
     } else if (event.key === 'Escape') {
       input.value = ''
-      status.textContent = ''
+      setStatus('')
       closeResults()
+      options.onClose()
     }
   })
 
   return {
     element: search,
-    announce(message) {
-      status.textContent = message
-    },
+    status,
+    announce: setStatus,
+    focus: () => input.focus(),
   }
 }

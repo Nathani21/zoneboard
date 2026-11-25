@@ -40,6 +40,10 @@ reviews:
       instructions: >-
         Pure: converts the board to and from text, never calls localStorage itself.
         Saved data is untrusted input and must be fully validated. Tests in src/storage.test.ts.
+    - path: "src/home.ts"
+      instructions: >-
+        Pure logic. Must not read the browser's time zone itself (it's passed in),
+        so tests don't depend on where they run. Tests in src/home.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
