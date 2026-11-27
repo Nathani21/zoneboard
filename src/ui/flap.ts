@@ -38,11 +38,27 @@ export function createTile(): Tile {
   return { element, char: '', top, bottom, flaps: [] }
 }
 
+/** Removes the moving halves of a flip that's still running. */
+function clearFlaps(tile: Tile): void {
+  for (const flap of tile.flaps) {
+    flap.remove()
+  }
+  tile.flaps = []
+}
+
 /**
  * Shows `next` on the tile. With `animate`, the old character's top half
- * folds down and the new character's bottom half lands under it.
+ * folds down and the new character's bottom half lands under it. Without it,
+ * the tile settles on `next` at once, even in the middle of a flip.
  */
 export function setTile(tile: Tile, next: string, animate: boolean): void {
+  if (!animate) {
+    clearFlaps(tile)
+    tile.char = next
+    tile.top.textContent = next
+    tile.bottom.textContent = next
+    return
+  }
   if (tile.char === next) {
     return
   }
@@ -50,18 +66,11 @@ export function setTile(tile: Tile, next: string, animate: boolean): void {
   tile.char = next
 
   // A newer flip replaces one that's still running
-  for (const flap of tile.flaps) {
-    flap.remove()
-  }
-  tile.flaps = []
+  clearFlaps(tile)
 
-  // The new top is revealed as the old top folds away
+  // The new top is revealed as the old top folds away,
+  // and the old bottom stays until the new bottom lands on it
   tile.top.textContent = next
-  if (!animate) {
-    tile.bottom.textContent = next
-    return
-  }
-  // The old bottom stays until the new bottom lands on it
   tile.bottom.textContent = previous
 
   const [falling] = half('top', 'flap', previous)
