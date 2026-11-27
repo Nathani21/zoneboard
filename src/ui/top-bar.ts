@@ -93,14 +93,17 @@ function createFullscreenButton(): HTMLButtonElement | null {
   return button
 }
 
-/** The bar across the top: menu on the left, X and full screen on the right. */
-export function createTopBar(menuItems: HTMLElement[]): HTMLElement {
+/**
+ * The bar across the top: menu and mode tabs on the left, X and full screen
+ * on the right.
+ */
+export function createTopBar(menuItems: HTMLElement[], tabs: HTMLElement): HTMLElement {
   const bar = document.createElement('header')
   bar.className = 'top-bar'
 
   const left = document.createElement('div')
   left.className = 'top-bar-group'
-  left.append(createMenu(menuItems))
+  left.append(createMenu(menuItems), tabs)
 
   const right = document.createElement('div')
   right.className = 'top-bar-group'

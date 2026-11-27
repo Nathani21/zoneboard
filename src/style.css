@@ -87,6 +87,116 @@ body {
   position: relative;
 }
 
+.mode-tabs {
+  box-sizing: border-box;
+  display: flex;
+  gap: 2px;
+  height: 40px;
+  padding: 3px;
+  border: 1px solid light-dark(#cfccc4, #333333);
+  border-radius: 999px;
+  background: light-dark(#ffffff, #181818);
+}
+
+.mode-tabs a {
+  display: grid;
+  place-items: center;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  color: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.mode-tabs a[aria-current='page'] {
+  background: light-dark(#f0eee7, #2a2a2a);
+  opacity: 1;
+}
+
+.mode-tabs a:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+/* Watch mode: an analogue clock in the board's colours */
+.watch {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.watch[hidden] {
+  display: none;
+}
+
+.watch svg {
+  width: min(70vmin, 480px);
+  height: auto;
+}
+
+.watch-face {
+  fill: var(--tile);
+  stroke: light-dark(#cfccc4, #333333);
+  stroke-width: 1;
+}
+
+.watch-tick {
+  stroke: var(--flap-text);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.watch-tick.major {
+  stroke-width: 2.5;
+  opacity: 0.8;
+}
+
+.watch-numeral {
+  fill: var(--flap-text);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 22px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  opacity: 0.55;
+}
+
+.watch-hand {
+  stroke-linecap: round;
+}
+
+.watch-hand.hour {
+  stroke: var(--flap-text);
+  stroke-width: 7;
+}
+
+.watch-hand.minute {
+  stroke: var(--flap-text);
+  stroke-width: 4.5;
+}
+
+.watch-hand.second {
+  stroke: #f2f2f2;
+  stroke-width: 1.5;
+}
+
+.watch-cap {
+  fill: #f2f2f2;
+}
+
+.watch-caption {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* Adding cities only makes sense on the board */
+[data-mode='watch'] .bottom-centre {
+  display: none;
+}
+
 .menu-panel {
   box-sizing: border-box; /* width includes padding and border, so it never overflows */
   position: absolute;

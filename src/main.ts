@@ -1,13 +1,16 @@
 import './style.css'
 import { DEFAULT_CITIES, msUntilNextMinute } from './board'
 import { resolveHomeTimeZone } from './home'
+import { parseMode, type Mode } from './modes'
 import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 import { createBoardView } from './ui/board-view'
 import { createBottomBar } from './ui/bottom-bar'
 import { readStorage, writeStorage } from './ui/local-storage'
 import { createMenuItems } from './ui/menu-items'
+import { createModeTabs } from './ui/mode-tabs'
 import { createSearchBox } from './ui/search-box'
 import { createTopBar } from './ui/top-bar'
+import { createWatchView } from './ui/watch-view'
 
 const app = document.querySelector<HTMLDivElement>('#app')
 if (!app) {
@@ -33,7 +36,33 @@ const main = document.createElement('main')
 main.className = 'board'
 main.append(board.element)
 
-app.replaceChildren(createTopBar(createMenuItems()), main, bottomBar.element)
+const watch = createWatchView(homeTimeZone)
+const tabs = createModeTabs()
+
+app.replaceChildren(
+  createTopBar(createMenuItems(), tabs.element),
+  main,
+  watch.element,
+  bottomBar.element,
+)
+
+/** Shows one mode's screen and hides the others. */
+function showMode(mode: Mode): void {
+  document.documentElement.dataset.mode = mode
+  main.hidden = mode !== 'world'
+  watch.element.hidden = mode !== 'watch'
+  tabs.update(mode)
+  bottomBar.closeSearch(false)
+  if (mode === 'watch') {
+    watch.start()
+  } else {
+    watch.stop()
+  }
+}
+
+// The tabs are links to "#world" / "#watch", so the URL says which mode is open
+window.addEventListener('hashchange', () => showMode(parseMode(window.location.hash)))
+showMode(parseMode(window.location.hash))
 
 /** Update now, then again just after each minute changes. */
 function tick(): void {
