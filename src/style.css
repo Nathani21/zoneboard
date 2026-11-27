@@ -120,6 +120,29 @@ body {
   outline-offset: 2px;
 }
 
+
+.menu-link {
+  color: inherit;
+  font-size: 0.85rem;
+}
+
+.menu-link:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+/* Phones: compact tabs, and the 𝕏 link lives in the menu, so everything fits */
+@media (max-width: 480px) {
+  .mode-tabs a {
+    padding: 0 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .top-bar .x-link {
+    display: none;
+  }
+}
+
 /* Watch mode: an analogue clock in the board's colours */
 .watch {
   display: grid;
@@ -192,8 +215,70 @@ body {
   opacity: 0.7;
 }
 
+/* Focus mode: a stopwatch on flap tiles, with a quote */
+.focus {
+  display: grid;
+  justify-items: center;
+  gap: calc(var(--cell) * 0.6);
+  max-width: min(36rem, calc(100vw - 32px));
+  text-align: center;
+}
+
+.focus[hidden] {
+  display: none;
+}
+
+/* Bigger tiles than the board: the stopwatch is the only thing on screen */
+.focus-time .time {
+  display: flex;
+  gap: 3px;
+  --cell: clamp(28px, 11vw, 88px);
+}
+
+.focus-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.focus-button {
+  min-width: 6.5rem;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.focus-button.primary {
+  border-color: var(--flap-text);
+}
+
+.focus-button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.focus-button:focus-visible {
+  outline: 2px solid var(--flap-text);
+  outline-offset: 2px;
+}
+
+.focus-quote {
+  margin: 0;
+}
+
+.focus-quote blockquote {
+  margin: 0;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.focus-quote figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
 /* Adding cities only makes sense on the board */
-[data-mode='watch'] .bottom-centre {
+:root:not([data-mode='world']) .bottom-centre {
   display: none;
 }
 

@@ -5,6 +5,7 @@ import { parseMode } from './modes'
 import { parseSavedCities, serializeCities, STORAGE_KEY } from './storage'
 import { createBoardView } from './ui/board-view'
 import { createBottomBar } from './ui/bottom-bar'
+import { createFocusView } from './ui/focus-view'
 import { readStorage, writeStorage } from './ui/local-storage'
 import { createMenuItems } from './ui/menu-items'
 import { createModeController } from './ui/mode-controller'
@@ -38,20 +39,22 @@ main.className = 'board'
 main.append(board.element)
 
 const watch = createWatchView(homeTimeZone)
+const focus = createFocusView()
 const tabs = createModeTabs()
 
 app.replaceChildren(
   createTopBar(createMenuItems(), tabs.element),
   main,
   watch.element,
+  focus.element,
   bottomBar.element,
 )
 
-const modes = createModeController({ world: { element: main }, watch }, tabs, () =>
+const modes = createModeController({ world: { element: main }, watch, focus }, tabs, () =>
   bottomBar.closeSearch(false),
 )
 
-// The tabs are links to "#world" / "#watch", so the URL says which mode is open
+// The tabs are links ("#world", "#watch", "#focus"), so the URL says which mode is open
 window.addEventListener('hashchange', () => modes.show(parseMode(window.location.hash)))
 modes.show(parseMode(window.location.hash))
 
