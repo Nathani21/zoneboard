@@ -8,6 +8,8 @@
   --tile-split: rgb(0 0 0 / 0.7);
   --flap-text: #ffb31a;
   --cell: clamp(14px, 5vw, 44px);
+  /* How long half a flip takes; keep 2 × this under FRAME_MS in board-view.ts */
+  --half-flip: 55ms;
 }
 
 /* The theme switch overrides the system setting; light-dark() follows color-scheme */
@@ -140,23 +142,101 @@ body {
 
 .cell {
   position: relative;
-  display: grid;
-  place-items: center;
   width: calc(var(--cell) * 0.72);
   height: var(--cell);
-  border-radius: 3px;
-  background: var(--tile);
   color: var(--flap-text);
   font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
   font-size: calc(var(--cell) * 0.68);
   font-weight: 700;
   line-height: 1;
+  /* Depth for the folding halves */
+  perspective: calc(var(--cell) * 4);
+}
+
+/* Each tile is two halves; each half clips a full-height character */
+.half,
+.flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  background: var(--tile);
+}
+
+.half > span,
+.flap > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--cell);
+  display: grid;
+  place-items: center;
+}
+
+.top {
+  top: 0;
+  border-radius: 3px 3px 0 0;
+  transform-origin: bottom;
+}
+
+.top > span {
+  top: 0;
+}
+
+.bottom {
+  bottom: 0;
+  border-radius: 0 0 3px 3px;
+  transform-origin: top;
+}
+
+.bottom > span {
+  bottom: 0;
+}
+
+/* The moving halves: the old top folds down, then the new bottom lands */
+.flap {
+  z-index: 1;
+  backface-visibility: hidden;
+}
+
+.flap.top {
+  animation: fold-top var(--half-flip) ease-in forwards;
+}
+
+.flap.bottom {
+  transform: rotateX(90deg);
+  animation: fold-bottom var(--half-flip) ease-out var(--half-flip) forwards;
+}
+
+@keyframes fold-top {
+  to {
+    transform: rotateX(-90deg);
+    filter: brightness(0.6);
+  }
+}
+
+@keyframes fold-bottom {
+  from {
+    transform: rotateX(90deg);
+    filter: brightness(1.4);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flap {
+    display: none;
+  }
 }
 
 /* The thin line across the middle of each split-flap tile */
 .cell::after {
   content: '';
   position: absolute;
+  z-index: 2;
   inset: 50% 0 auto;
   height: 1px;
   background: var(--tile-split);
