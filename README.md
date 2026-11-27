@@ -15,7 +15,7 @@ Your city list and theme choice are saved only in your own browser (`localStorag
 ## Features
 
 - Split-flap board with live 24-hour times and GMT offsets, updated on the minute
-- Scramble animation when tiles change; only the tiles that change animate
+- Real split-flap animation: each tile's top half folds down in 3D and the new bottom half lands; on load and when you add a city the whole row churns, on a minute change only the changed digits flip
 - Turns the animation off for visitors with **reduce motion** switched on in their system settings
 - Time zone button at the bottom shows your own zone (e.g. "Lagos · GMT+1") and opens the city search
 - Search 152 cities by name or country; ignores case and accents ("bogota" finds Bogotá)
@@ -45,7 +45,7 @@ Then open http://localhost:5173.
 npm test
 ```
 
-124 tests with [Vitest](https://vitest.dev). CI runs the tests and a type-checked build on every pull request.
+125 tests with [Vitest](https://vitest.dev). CI runs the tests and a type-checked build on every pull request.
 
 ## How it works
 
@@ -60,14 +60,13 @@ The logic is split into small, pure TypeScript modules with no access to the pag
 | `src/search.ts` | Ranked, accent-insensitive city search, and what the search box should say |
 | `src/home.ts` | The visitor's own time zone as "City · GMT±n", including renamed zones |
 | `src/storage.ts` | Saving the board and theme choice, and validating them on load (saved data is treated as untrusted) |
-| `src/ui/` | The only code that touches the page: `board-view.ts`, `search-box.ts`, `top-bar.ts`, `bottom-bar.ts`, `menu-items.ts`, `theme-switch.ts`, `icons.ts`, and `local-storage.ts` (storage that never crashes the app) |
+| `src/ui/` | The only code that touches the page: `board-view.ts`, `flap.ts` (one split-flap tile), `search-box.ts`, `top-bar.ts`, `bottom-bar.ts`, `menu-items.ts`, `theme-switch.ts`, `icons.ts`, and `local-storage.ts` (storage that never crashes the app) |
 | `src/main.ts` | Wires the pieces together and runs the clock |
 
 No framework: plain TypeScript, built with [Vite](https://vite.dev) and hosted on [Vercel](https://vercel.com).
 
 ## Roadmap
 
-- Real split-flap animation: tiles that fold down in 3D
 - Watch mode: an analogue clock
 - Focus mode: a stopwatch with a different quote on each visit
 - Optional flap sound
