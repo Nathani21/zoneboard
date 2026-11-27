@@ -65,3 +65,25 @@ export function formatDate(date: Date, timeZone: string, locale?: string): strin
     month: 'short',
   }).format(date)
 }
+
+
+/** Hours (0-23), minutes and seconds on the clock in the given zone. */
+export interface TimeParts {
+  hours: number
+  minutes: number
+  seconds: number
+}
+
+/** The clock reading in a zone at that moment, e.g. 14:28:05 in Lagos. */
+export function timeParts(date: Date, timeZone: string): TimeParts {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((p) => p.type === type)?.value ?? 0)
+  return { hours: part('hour'), minutes: part('minute'), seconds: part('second') }
+}

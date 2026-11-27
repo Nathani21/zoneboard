@@ -44,6 +44,14 @@ reviews:
       instructions: >-
         Pure logic. Must not read the browser's time zone itself (it's passed in),
         so tests don't depend on where they run. Tests in src/home.test.ts.
+    - path: "src/watch.ts"
+      instructions: >-
+        Pure clock maths. Must not touch the DOM or read the time itself; the
+        clock reading is passed in. Tests in src/watch.test.ts.
+    - path: "src/modes.ts"
+      instructions: >-
+        Pure. Every mode needs a label (enforced by the Record type) and unknown
+        hashes must fall back to World Time. Tests in src/modes.test.ts.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,

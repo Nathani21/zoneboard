@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatOffset, formatTime, isValidTimeZone, utcOffsetMinutes } from './zones'
+import {
+  formatDate,
+  formatOffset,
+  formatTime,
+  isValidTimeZone,
+  timeParts,
+  utcOffsetMinutes,
+} from './zones'
 
 const at = (iso: string) => new Date(iso)
 
@@ -87,5 +94,20 @@ describe('formatDate', () => {
 
   it('follows the locale', () => {
     expect(formatDate(at('2026-11-25T12:00:00Z'), 'Africa/Lagos', 'en-US')).toBe('Wed, Nov 25')
+  })
+})
+
+
+describe('timeParts', () => {
+  it('reads hours, minutes and seconds in the given zone', () => {
+    expect(timeParts(at('2026-11-25T13:28:05Z'), 'Africa/Lagos')).toEqual({
+      hours: 14,
+      minutes: 28,
+      seconds: 5,
+    })
+  })
+
+  it('uses 0, not 24, for midnight', () => {
+    expect(timeParts(at('2026-01-01T08:00:00Z'), 'America/Los_Angeles').hours).toBe(0)
   })
 })
