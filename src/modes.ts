@@ -1,5 +1,5 @@
 /** The app's screens, in the order the tabs show them. */
-export const MODES = ['world', 'watch'] as const
+export const MODES = ['world', 'watch', 'focus'] as const
 
 export type Mode = (typeof MODES)[number]
 
@@ -7,6 +7,7 @@ export type Mode = (typeof MODES)[number]
 export const MODE_LABELS: Record<Mode, string> = {
   world: 'World Time',
   watch: 'Watch',
+  focus: 'Focus',
 }
 
 /**

@@ -1,8 +1,8 @@
 import { ENTER_FULLSCREEN_ICON, EXIT_FULLSCREEN_ICON, icon, MENU_ICON } from './icons'
 
-/** Links and labels for the top bar. */
-const X_PROFILE_URL = 'https://x.com/NoobLabs_21'
-const X_HANDLE = '@NoobLabs_21'
+/** The maker's X profile (also linked from the menu). */
+export const X_PROFILE_URL = 'https://x.com/NoobLabs_21'
+export const X_HANDLE = '@NoobLabs_21'
 
 /** The menu button and the panel it opens. Esc or a click outside closes it. */
 function createMenu(items: HTMLElement[]): HTMLDivElement {
@@ -53,7 +53,7 @@ function createMenu(items: HTMLElement[]): HTMLDivElement {
 /** Link to the maker's X profile, opening in a new tab. */
 function createXLink(): HTMLAnchorElement {
   const link = document.createElement('a')
-  link.className = 'icon-button'
+  link.className = 'icon-button x-link'
   link.href = X_PROFILE_URL
   link.target = '_blank'
   link.rel = 'noopener noreferrer'

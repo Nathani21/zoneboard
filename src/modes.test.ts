@@ -4,6 +4,7 @@ import { MODE_LABELS, MODES, parseMode } from './modes'
 describe('parseMode', () => {
   it.each([
     ['#watch', 'watch'],
+    ['#focus', 'focus'],
     ['#world', 'world'],
     ['#WATCH', 'watch'],
     ['watch', 'watch'],

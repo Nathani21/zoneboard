@@ -52,6 +52,14 @@ reviews:
       instructions: >-
         Pure. Every mode needs a label (enforced by the Record type) and unknown
         hashes must fall back to World Time. Tests in src/modes.test.ts.
+    - path: "src/stopwatch.ts"
+      instructions: >-
+        Pure. Must never read a clock; the current time is always passed in.
+        Tests in src/stopwatch.test.ts.
+    - path: "src/quotes.ts"
+      instructions: >-
+        Quotes must be short, correctly attributed, and from authors who died long
+        ago (or proverbs), so there are no copyright concerns. Randomness is passed in.
     - path: "src/**/*.test.ts"
       instructions: >-
         Vitest. Prefer it.each tables for cases. Use fixed ISO dates ending in Z,
