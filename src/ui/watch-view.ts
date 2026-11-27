@@ -1,10 +1,9 @@
 import { CITIES } from '../cities'
 import { homeLabel } from '../home'
-import { handAngles } from '../watch'
+import { CLOCK_CENTRE as CENTRE, handAngles, polar } from '../watch'
 import { formatTime, timeParts } from '../zones'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
-const CENTRE = 100
 
 export interface WatchView {
   /** The clock and its caption, to put on the page. */
@@ -25,12 +24,6 @@ function svg<K extends keyof SVGElementTagNameMap>(
     element.setAttribute(name, String(value))
   }
   return element
-}
-
-/** A point `radius` from the centre, `degrees` clockwise from 12. */
-function polar(radius: number, degrees: number): [number, number] {
-  const radians = (degrees * Math.PI) / 180
-  return [CENTRE + radius * Math.sin(radians), CENTRE - radius * Math.cos(radians)]
 }
 
 /** A hand pointing at 12, from `tail` behind the centre to `length` in front. */

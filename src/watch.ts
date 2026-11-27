@@ -18,3 +18,16 @@ export function handAngles({ hours, minutes, seconds }: TimeParts): HandAngles {
     second: seconds * 6,
   }
 }
+
+
+/** The centre of the clock face, in the SVG's 200 × 200 coordinate space. */
+export const CLOCK_CENTRE = 100
+
+/**
+ * The point `radius` from the centre at `degrees` clockwise from 12, as [x, y].
+ * SVG's y axis points down, so 12 o'clock is above the centre (smaller y).
+ */
+export function polar(radius: number, degrees: number): [number, number] {
+  const radians = (degrees * Math.PI) / 180
+  return [CLOCK_CENTRE + radius * Math.sin(radians), CLOCK_CENTRE - radius * Math.cos(radians)]
+}
