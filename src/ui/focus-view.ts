@@ -22,20 +22,21 @@ export interface FocusView {
   stop: () => void
 }
 
-/** A quote that's different from the one shown on the last visit. */
-function createQuote(): HTMLElement {
+/**
+ * Fills `figure` with a quote different from the one shown last time, and
+ * remembers it. Only called when Focus is actually on screen, so the saved
+ * quote is always one the visitor saw.
+ */
+function fillQuote(figure: HTMLElement): void {
   const previous = parseQuoteIndex(readStorage(QUOTE_KEY), QUOTES.length)
   const index = pickQuoteIndex(QUOTES.length, Math.random, previous)
   writeStorage(QUOTE_KEY, String(index))
 
-  const figure = document.createElement('figure')
-  figure.className = 'focus-quote'
   const text = document.createElement('blockquote')
   text.textContent = QUOTES[index].text
   const author = document.createElement('figcaption')
   author.textContent = `— ${QUOTES[index].author}`
-  figure.append(text, author)
-  return figure
+  figure.replaceChildren(text, author)
 }
 
 /** Focus mode: a stopwatch on split-flap tiles, with a quote underneath. */
@@ -75,11 +76,16 @@ export function createFocusView(): FocusView {
   resetButton.textContent = 'Reset'
   controls.append(startButton, resetButton)
 
-  element.append(display, controls, createQuote())
+  // Empty until Focus first opens (see fillQuote)
+  const quote = document.createElement('figure')
+  quote.className = 'focus-quote'
+
+  element.append(display, controls, quote)
 
   let stopwatch: Stopwatch = NEW_STOPWATCH
   let timer = 0
   let visible = false
+  let quoteShown = false
 
   function render(): void {
     const now = performance.now()
@@ -126,6 +132,10 @@ export function createFocusView(): FocusView {
     element,
     start() {
       visible = true
+      if (!quoteShown) {
+        quoteShown = true
+        fillQuote(quote)
+      }
       render()
       schedule()
     },
