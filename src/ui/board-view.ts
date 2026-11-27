@@ -7,13 +7,9 @@ import {
   type City,
 } from '../board'
 import { scrambleFrame, scrambleLength } from '../scramble'
-import { createTile, setTile, type Tile } from './flap'
 
-/**
- * How long each scramble frame stays on screen. A little longer than one
- * whole flip (2 × --half-flip in style.css), so each fold finishes.
- */
-const FRAME_MS = 120
+/** How long each scramble frame stays on screen. */
+const FRAME_MS = 50
 const TIME_CELLS = 5
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -23,7 +19,7 @@ interface RowView {
   city: City
   item: HTMLLIElement
   remove: HTMLButtonElement
-  cells: Tile[]
+  cells: HTMLSpanElement[]
   offset: HTMLSpanElement
   spoken: HTMLSpanElement
   target: string[]
@@ -49,23 +45,28 @@ export interface BoardView {
 }
 
 /** A group of blank tiles. Hidden from screen readers (they get the text instead). */
-function createCells(count: number, className: string): [HTMLSpanElement, Tile[]] {
+function createCells(count: number, className: string): [HTMLSpanElement, HTMLSpanElement[]] {
   const group = document.createElement('span')
   group.className = className
   group.setAttribute('aria-hidden', 'true')
-  const cells: Tile[] = []
+  const cells: HTMLSpanElement[] = []
   for (let i = 0; i < count; i++) {
-    const tile = createTile()
-    group.append(tile.element)
-    cells.push(tile)
+    const cell = document.createElement('span')
+    cell.className = 'cell'
+    cell.textContent = ' '
+    group.append(cell)
+    cells.push(cell)
   }
   return [group, cells]
 }
 
-/** Put characters on the tiles; only tiles whose character changes flip. */
-function show(view: RowView, chars: readonly string[], animate: boolean): void {
+/** Put characters on the tiles, touching only tiles that change. */
+function show(view: RowView, chars: readonly string[]): void {
   chars.forEach((char, index) => {
-    setTile(view.cells[index], char, animate)
+    const cell = view.cells[index]
+    if (cell.textContent !== char) {
+      cell.textContent = char
+    }
   })
 }
 
@@ -77,7 +78,7 @@ function animateTo(view: RowView, target: string[]): void {
   const animation = ++view.animation // a newer animation cancels this one
 
   if (frames === 0 || reduceMotion.matches) {
-    show(view, target, false)
+    show(view, target)
     return
   }
 
@@ -89,13 +90,13 @@ function animateTo(view: RowView, target: string[]): void {
     }
     if (time - lastFrameTime >= FRAME_MS) {
       lastFrameTime = time
-      show(view, scrambleFrame(from, target, frame, Math.random), true)
+      show(view, scrambleFrame(from, target, frame, Math.random))
       frame++
     }
     if (frame < frames) {
       requestAnimationFrame(step)
     } else {
-      show(view, target, true)
+      show(view, target)
     }
   }
   requestAnimationFrame(step)
@@ -173,8 +174,7 @@ export function createBoardView(initial: readonly City[], options: BoardViewOpti
       cells,
       offset,
       spoken,
-      // '' (not a space) so every tile, blanks included, flips in on the first draw
-      target: cells.map(() => ''),
+      target: cells.map(() => ' '),
       animation: 0,
     }
     remove.addEventListener('click', () => removeRow(view))

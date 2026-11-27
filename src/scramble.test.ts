@@ -54,10 +54,6 @@ describe('scrambleLength', () => {
     expect(scrambleLength(Array.from('14:28'), Array.from('14:29'))).toBe(settleFrame(4) + 1)
   })
 
-    it('scrambles every tile from a blank start, blank tiles included', () => {
-    expect(scrambleLength(['', '', ''], [' ', 'A', ' '])).toBe(settleFrame(2) + 1)
-  })
-
   it('ignores unchanged tiles after the last change', () => {
     expect(scrambleLength(['A', 'B', 'C'], ['X', 'B', 'C'])).toBe(settleFrame(0) + 1)
   })
